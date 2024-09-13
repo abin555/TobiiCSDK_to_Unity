@@ -9,6 +9,12 @@ public class TobiiTest : MonoBehaviour
     TobiiResearch.EyeTracker eyeTracker;
     public GameObject leftEye;
     public GameObject rightEye;
+
+    public float left_gazeX;
+    public float left_gazeY;
+
+    public float right_gazeX;
+    public float right_gazeY;
     // Start is called before the first frame update
     void Start()
     {
@@ -29,15 +35,15 @@ public class TobiiTest : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        float left_gazeX = (TobiiResearch.latestGazeData.leftEye.gazePoint.displayPos.x - 0.5f) * 2;
-        float left_gazeY = (TobiiResearch.latestGazeData.leftEye.gazePoint.displayPos.y - 0.5f) * 2;
+        left_gazeX = (TobiiResearch.leftEye.x - 0.5f) * 2;
+        left_gazeY = (TobiiResearch.leftEye.y - 0.5f) * 2;
         if(!(float.IsNaN(left_gazeX) || float.IsNaN(left_gazeY))){
-            leftEye.transform.position = new Vector3(left_gazeX, -1 * left_gazeY, 0);
+            leftEye.transform.position = new Vector3(left_gazeX, 0, -1 * left_gazeY);
         }
-        float right_gazeX = (TobiiResearch.latestGazeData.rightEye.gazePoint.displayPos.x - 0.5f) * 2;
-        float right_gazeY = (TobiiResearch.latestGazeData.rightEye.gazePoint.displayPos.y - 0.5f) * 2;
+        right_gazeX = (TobiiResearch.rightEye.x - 0.5f) * 2;
+        right_gazeY = (TobiiResearch.rightEye.y - 0.5f) * 2;
         if(!(float.IsNaN(right_gazeX) || float.IsNaN(right_gazeY))){
-            rightEye.transform.position = new Vector3(right_gazeX, -1 * right_gazeY, 0);
+            rightEye.transform.position = new Vector3(right_gazeX, 0, -1 * right_gazeY);
         }
     }
 

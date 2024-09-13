@@ -95,7 +95,7 @@ public class TobiiResearch {
 
 	[StructLayout(LayoutKind.Sequential)]
 	public struct GazeOrigin{
-		public Vec2 userPos;
+		public Vec3 userPos;
 		//Depricated
 		public Vec3 boxPos;
 
@@ -117,6 +117,8 @@ public class TobiiResearch {
 		long system_time_stamp;
 	}
 	public static GazeData latestGazeData;
+	public static Vec2 leftEye;
+	public static Vec2 rightEye;
 
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	public delegate void GazeCallbackType(System.IntPtr gaze_data, System.IntPtr user_data);
@@ -129,6 +131,11 @@ public class TobiiResearch {
 	public static void GazeCallback(System.IntPtr gaze_data, System.IntPtr user_data){
 		GazeData gazeData = Marshal.PtrToStructure<GazeData>(gaze_data);
 		latestGazeData = gazeData;
+		leftEye.x = gazeData.leftEye.gazePoint.displayPos.x;
+		leftEye.y = gazeData.leftEye.gazePoint.displayPos.y;
+
+		rightEye.x = gazeData.rightEye.gazePoint.displayPos.x;
+		rightEye.y = gazeData.rightEye.gazePoint.displayPos.y;
 	}
 
 	public static void SubscribeGaze(ref EyeTracker eyeTracker, GazeCallbackType callback){
