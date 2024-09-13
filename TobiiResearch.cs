@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
 using System;
+using Tobii.Research;
+using Unity.VisualScripting;
 
 public class TobiiResearch {
 
@@ -65,7 +67,77 @@ public class TobiiResearch {
 	}
 
 	[StructLayout(LayoutKind.Sequential)]
+	public struct Vec2{
+		public float x;
+		public float y;
+	}
+
+	[StructLayout(LayoutKind.Sequential)]
+	public struct Vec3{
+		public float x;
+		public float y;
+		public float z;
+	}
+	
+	
+	[StructLayout(LayoutKind.Sequential)]
+	public struct GazePoint{
+		public Vec2 displayPos;
+		public Vec3 userCoord;
+		public int validity;
+	}
+
+	[StructLayout(LayoutKind.Sequential)]
+	public struct PupilData{
+		public float diameter;
+		public int validity;
+	}
+
+	[StructLayout(LayoutKind.Sequential)]
+	public struct GazeOrigin{
+		public Vec2 userPos;
+		//Depricated
+		public Vec3 boxPos;
+
+		public int validity;
+	}
+
+	[StructLayout(LayoutKind.Sequential)]
+	public struct EyeData{
+		public GazePoint gazePoint;
+		public PupilData pupilData;
+		public GazeOrigin gazeOrigin;
+	}
+
+	[StructLayout(LayoutKind.Sequential)]
 	public struct GazeData{
-		
+		public EyeData leftEye;
+		public EyeData rightEye;
+		long device_time_stamp;
+		long system_time_stamp;
+	}
+	public static GazeData latestGazeData;
+
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+	public delegate void GazeCallbackType(System.IntPtr gaze_data, System.IntPtr user_data);
+
+	[DllImport("libtobii_research", CallingConvention = CallingConvention.Cdecl)]
+	public static extern int tobii_research_subscribe_to_gaze_data(System.IntPtr eyeTracker, GazeCallbackType callback, System.IntPtr user_data);
+	[DllImport("libtobii_research", CallingConvention = CallingConvention.Cdecl)]
+	public static extern int tobii_research_unsubscribe_from_gaze_data(System.IntPtr eyeTracker, GazeCallbackType callback);
+	
+	public static void GazeCallback(System.IntPtr gaze_data, System.IntPtr user_data){
+		GazeData gazeData = Marshal.PtrToStructure<GazeData>(gaze_data);
+		latestGazeData = gazeData;
+	}
+
+	public static void SubscribeGaze(ref EyeTracker eyeTracker, GazeCallbackType callback){
+		IntPtr callbackPtr = Marshal.GetFunctionPointerForDelegate(callback);
+		tobii_research_subscribe_to_gaze_data(eyeTracker.tracker, callback, IntPtr.Zero);
+	}
+
+	public static void UnsubscribeGaze(ref EyeTracker eyeTracker, GazeCallbackType callback){
+		IntPtr callbackPtr = Marshal.GetFunctionPointerForDelegate(callback);
+		tobii_research_unsubscribe_from_gaze_data(eyeTracker.tracker, callback);
 	}
 }
