@@ -10,11 +10,15 @@ public class TobiiTest : MonoBehaviour
     public GameObject leftEye;
     public GameObject rightEye;
 
+    public Camera camera;
+
     public float left_gazeX;
     public float left_gazeY;
 
     public float right_gazeX;
     public float right_gazeY;
+
+    public Vector3 worldPoint;
     // Start is called before the first frame update
     void Start()
     {
@@ -35,16 +39,32 @@ public class TobiiTest : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        left_gazeX = (TobiiResearch.leftEye.x - 0.5f) * 2;
-        left_gazeY = (TobiiResearch.leftEye.y - 0.5f) * 2;
-        if(!(float.IsNaN(left_gazeX) || float.IsNaN(left_gazeY))){
-            leftEye.transform.position = new Vector3(left_gazeX, 0, -1 * left_gazeY);
-        }
-        right_gazeX = (TobiiResearch.rightEye.x - 0.5f) * 2;
-        right_gazeY = (TobiiResearch.rightEye.y - 0.5f) * 2;
-        if(!(float.IsNaN(right_gazeX) || float.IsNaN(right_gazeY))){
-            rightEye.transform.position = new Vector3(right_gazeX, 0, -1 * right_gazeY);
-        }
+        left_gazeX = (TobiiResearch.leftEye.x);
+        left_gazeY = (TobiiResearch.leftEye.y);
+        right_gazeX = (TobiiResearch.rightEye.x);
+        right_gazeY = (TobiiResearch.rightEye.y);
+
+        int numValid = 0;
+        if(!float.IsNaN(left_gazeX)) numValid++;
+        if(!float.IsNaN(right_gazeX)) numValid++;
+
+        float avg_x = ((float.IsNaN(left_gazeX) ? 0 : left_gazeX) + (float.IsNaN(right_gazeX) ? 0 : right_gazeX)) / numValid;
+        float avg_y = ((float.IsNaN(left_gazeX) ? 0 : left_gazeY) + (float.IsNaN(right_gazeX) ? 0 : right_gazeY)) / numValid;
+
+        int ScreenW = Screen.width;
+        int ScreenH = Screen.height;
+
+        int ScreenX = (int)(ScreenW * avg_x);
+        int ScreenY = (int)(ScreenH - ScreenH * avg_y);
+
+        Vector3 screenPoint;
+        screenPoint.x = ScreenX;
+        screenPoint.y = ScreenY;
+        screenPoint.z = 1;
+
+        worldPoint = camera.ScreenToWorldPoint(screenPoint, camera.stereoActiveEye);
+
+        leftEye.transform.position = new Vector3(worldPoint.x, worldPoint.y, worldPoint.z);
     }
 
     void OnApplicationQuit(){
