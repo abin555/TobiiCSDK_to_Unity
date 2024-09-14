@@ -19,6 +19,8 @@ public class TobiiTest : MonoBehaviour
     public float right_gazeY;
 
     public Vector3 worldPoint;
+
+    public float objectDistance = 2;
     // Start is called before the first frame update
     void Start()
     {
@@ -60,7 +62,7 @@ public class TobiiTest : MonoBehaviour
         Vector3 screenPoint;
         screenPoint.x = ScreenX;
         screenPoint.y = ScreenY;
-        screenPoint.z = 1;
+        screenPoint.z = objectDistance;
 
         worldPoint = camera.ScreenToWorldPoint(screenPoint, camera.stereoActiveEye);
 
