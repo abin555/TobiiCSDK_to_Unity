@@ -17,13 +17,28 @@ public class TobiiResearch {
 		public System.IntPtr tracker;
 	};
 
-	[DllImport ("libtobii_research", EntryPoint="tobii_research_find_all_eyetrackers")]
+	#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+	    [DllImport("tobii_research", EntryPoint = "tobii_research_find_all_eyetrackers")]
+	#elif UNITY_STANDALONE_LINUX || UNITY_EDITOR_LINUX
+	    [DllImport("libtobii_research.so", EntryPoint = "tobii_research_find_all_eyetrackers")]
+	#endif
+	//[DllImport ("libtobii_research", EntryPoint="tobii_research_find_all_eyetrackers")]
 	private static extern int tobii_research_find_all_eyetrackers(ref System.IntPtr eyetrackers);
 
-	[DllImport ("libtobii_research", EntryPoint="tobii_research_free_eyetrackers")]
+	#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+	    [DllImport("tobii_research", EntryPoint="tobii_research_free_eyetrackers")]
+	#elif UNITY_STANDALONE_LINUX || UNITY_EDITOR_LINUX
+	    [DllImport("libtobii_research.so", EntryPoint="tobii_research_free_eyetrackers")]
+	#endif
+	//[DllImport ("libtobii_research", EntryPoint="tobii_research_free_eyetrackers")]
 	private static extern int tobii_research_free_eyetrackers(System.IntPtr eyetrackers);
 
-	[DllImport ("libtobii_research", EntryPoint="tobii_research_get_device_name")]
+	#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+	    [DllImport("tobii_research", EntryPoint="tobii_research_get_device_name")]
+	#elif UNITY_STANDALONE_LINUX || UNITY_EDITOR_LINUX
+	    [DllImport("libtobii_research.so", EntryPoint="tobii_research_get_device_name")]
+	#endif
+	//[DllImport ("libtobii_research", EntryPoint="tobii_research_get_device_name")]
 	private static extern int tobii_research_get_device_name(System.IntPtr eyetracker, ref System.IntPtr device_name);
 
 	public static int FindEyeTrackers(ref TobiiResearchEyeTrackers eyeTrackers){
@@ -55,7 +70,7 @@ public class TobiiResearch {
 		if(eyeTrackers.eyetrackers == System.IntPtr.Zero) return;
 		System.IntPtr ptr = System.IntPtr.Zero;
 		Marshal.StructureToPtr(eyeTrackers, ptr, false);
-		tobii_research_free_eyetrackers(ptr);		
+		tobii_research_free_eyetrackers(ptr);
 	}
 
 	public static string GetDeviceName(ref EyeTracker eyeTracker){
@@ -77,8 +92,8 @@ public class TobiiResearch {
 		public float y;
 		public float z;
 	}
-	
-	
+
+
 	[StructLayout(LayoutKind.Sequential)]
 	public struct GazePoint{
 		public Vec2 displayPos;
@@ -122,11 +137,22 @@ public class TobiiResearch {
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	public delegate void GazeCallbackType(System.IntPtr gaze_data, System.IntPtr user_data);
 
-	[DllImport("libtobii_research", CallingConvention = CallingConvention.Cdecl)]
+	#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+	    [DllImport("tobii_research", CallingConvention = CallingConvention.Cdecl)]
+	#elif UNITY_STANDALONE_LINUX || UNITY_EDITOR_LINUX
+	    [DllImport("libtobii_research.so", CallingConvention = CallingConvention.Cdecl)]
+	#endif
+	//[DllImport("libtobii_research", CallingConvention = CallingConvention.Cdecl)]
 	public static extern int tobii_research_subscribe_to_gaze_data(System.IntPtr eyeTracker, GazeCallbackType callback, System.IntPtr user_data);
-	[DllImport("libtobii_research", CallingConvention = CallingConvention.Cdecl)]
+
+	#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+			[DllImport("tobii_research", CallingConvention = CallingConvention.Cdecl)]
+	#elif UNITY_STANDALONE_LINUX || UNITY_EDITOR_LINUX
+			[DllImport("libtobii_research.so", CallingConvention = CallingConvention.Cdecl)]
+	#endif
+	//[DllImport("libtobii_research", CallingConvention = CallingConvention.Cdecl)]
 	public static extern int tobii_research_unsubscribe_from_gaze_data(System.IntPtr eyeTracker, GazeCallbackType callback);
-	
+
 	public static void GazeCallback(System.IntPtr gaze_data, System.IntPtr user_data){
 		GazeData gazeData = Marshal.PtrToStructure<GazeData>(gaze_data);
 		latestGazeData = gazeData;
